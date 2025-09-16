@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevHades02 Chat - Asistente Inteligente</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8a2be2;
+            --primary-light: #9d4edd;
+            --primary-dark: #7b2cbf;
+            --bg-color: #f5f5f7;
+            --card-bg: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --text-tertiary: #888888;
+            --border-color: #e0e0e0;
+            --success: #34c759;
+            --warning: #ff9500;
+            --error: #ff3b30;
+            --ios-blue: #007aff;
+            --user-bubble: var(--ios-blue);
+            --bot-bubble: #f2f2f7;
+            --vip-bubble: linear-gradient(135deg, #ff9a00, #ff6a00);
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.18);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--card-bg);
+            padding: 16px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .header-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .header-icon:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            transform: scale(1.1);
+        }
+
+        /* Main Content */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Sidebar - Fixed on the side */
+        .sidebar {
+            width: 280px;
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            position: relative;
+            z-index: 20;
+            height: calc(100vh - 70px);
+        }
+
+        .sidebar-header {
+            margin-bottom: 25px;
+        }
+
+        .sidebar-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-tertiary);
+        }
+
+        .sidebar-section {
+            margin-bottom: 25px;
+        }
+
+        .sidebar-section-title {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-item:hover {
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+
+        .sidebar-item.active {
+            background-color: rgba(138, 43, 226, 0.1);
+            color: var(--primary);
+        }
+
+        .sidebar-item-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-item-text {
+            font-weight: 500;
+        }
+
+        /* Chat Container - Full Screen */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 70px);
+            position: relative;
+        }
+
+        .chat-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background-color: var(--card-bg);
+        }
+
+        .chat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .chat-title-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .chat-status {
+            font-size: 0.85rem;
+            color: var(--text-tertiary);
+        }
+
+        .online-badge {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--success);
+            margin-left: 6px;
+        }
+
+        /* Chat Messages */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background-color: var(--bg-color);
+        }
+
+        .message {
+            max-width: 75%;
+            padding: 14px 18px;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-user {
+            background-color: var(--user-bubble);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-bot {
+            background-color: var(--bot-bubble);
+            color: var(--text-primary);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-vip {
+            background: var(--vip-bubble);
+            color: white;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 16px rgba(255, 106, 0, 0.25);
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .message-sender {
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .verified-badge {
+            color: var(--ios-blue);
+            font-size: 0.7rem;
+        }
+
+        /* Code blocks in messages */
+        .code-container {
+            position: relative;
+            margin-top: 10px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .code-header {
+            background: rgba(0, 0, 0, 0.1);
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .copy-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            transition: all 0.2s ease;
+        }
+
+        .copy-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 12px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .code-block code {
+            color: #363;
+            white-space: pre-wrap;
+        }
+
+        .message-vip .code-block {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .message-vip .code-block code {
+            color: #fff;
+        }
+
+        /* Interactive buttons */
+        .message-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .message-button {
+            padding: 8px 14px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: white;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .message-button:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* Floating action buttons */
+        .floating-buttons {
+            position: absolute;
+            right: 20px;
+            bottom: 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 50;
+        }
+
+        .floating-button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(138, 43, 226, 0.3);
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .floating-button:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 6px 16px rgba(138, 43, 226, 0.4);
+        }
+
+        /* Chat Input */
+        .chat-input-container {
+            padding: 16px 20px;
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 14px 18px;
+            border-radius: 22px;
+            border: 1px solid var(--border-color);
+            font-size: 0.95rem;
+            outline: none;
+            background-color: var(--card-bg);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .chat-input:focus {
+            border-color: var(--ios-blue);
+            box-shadow: 0 2px 12px rgba(0, 122, 255, 0.15);
+        }
+
+        .send-button {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(138, 43, 226, 0.3);
+        }
+
+        .send-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(138, 43, 226, 0.4);
+        }
+
+        /* AI Suggested Buttons */
+        .ai-suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 12px 20px;
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .ai-suggestion {
+            padding: 8px 14px;
+            border-radius: 16px;
+            background-color: var(--bot-bubble);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .ai-suggestion:hover {
+            background-color: #e5e5ea;
+            transform: translateY(-2px);
+        }
+
+        /* VIP Badge */
+        .vip-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 10px;
+            background: var(--vip-bubble);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        /* Modal Overlays */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-weight: 600;
+            font-size: 1.3rem;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: none;
+            border: none;
+        }
+
+        .modal-close:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        /* Action buttons outside message bubbles */
+        .message-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+            margin-bottom: 16px;
+            max-width: 75%;
+            align-self: flex-start;
+        }
+
+        .message-action-button {
+            padding: 8px 14px;
+            border-radius: 16px;
+            background: var(--primary);
+            border: none;
+            color: white;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .message-action-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                top: 70px;
+                bottom: 0;
+                z-index: 100;
+                transition: left 0.3s ease;
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+            
+            .header-title {
+                font-size: 1.2rem;
+            }
+            
+            .message {
+                max-width: 85%;
+            }
+
+            .floating-buttons {
+                bottom: 70px;
+                right: 10px;
+            }
+
+            .message-actions {
+                max-width: 85%;
+            }
+        }
+
+        /* Dark mode */
+        body.dark-mode {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-primary: #f5f5f7;
+            --text-secondary: #a0a0a0;
+            --text-tertiary: #888888;
+            --border-color: #333333;
+            --bot-bubble: #2a2a2a;
+        }
+
+        /* Toggle sidebar button for mobile */
+        .sidebar-toggle {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar-toggle {
+                display: block;
+            }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #aaa;
+        }
+
+        body.dark-mode ::-webkit-scrollbar-thumb {
+            background: #555;
+        }
+
+        body.dark-mode ::-webkit-scrollbar-thumb:hover {
+            background: #777;
+        }
+    </style>
+</head>
+<body>
+  <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <div class="header-icon sidebar-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </div>
+            <h1 class="header-title">DevHades02 Chat</h1>
+        </div>
+        <div class="header-right">
+            <div class="header-icon" onclick="openModal('settingsModal')">
+                <i class="fas fa-cog"></i>
+            </div>
+            <div class="header-icon" onclick="toggleTheme()">
+                <i class="fas fa-moon"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">DevHades02</div>
+                <div class="sidebar-subtitle">Asistente Inteligente</div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">
+                    <i class="fas fa-robot"></i>
+                    <span>Asistente AI</span>
+                </div>
+                <div class="sidebar-item active" onclick="changeChatMode('ai')">
+                    <div class="sidebar-item-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="sidebar-item-text">Chat General</div>
+                </div>
+                <div class="sidebar-item" onclick="changeChatMode('code')">
+                    <div class="sidebar-item-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <div class="sidebar-item-text">Asistente de Código</div>
+                </div>
+                <div class="sidebar-item" onclick="changeChatMode('creative')">
+                    <div class="sidebar-item-icon">
+                        <i class="fas fa-paint-brush"></i>
+                    </div>
+                    <div class="sidebar-item-text">Modo Creativo</div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">
+                    <i class="fas fa-crown"></i>
+                    <span>DevHades02 VIP</span>
+                </div>
+                <div class="sidebar-item" onclick="showVIPContent()">
+                    <div class="sidebar-item-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="sidebar-item-text">Contenido Exclusivo</div>
+                </div>
+                <div class="sidebar-item" onclick="showProjects()">
+                    <div class="sidebar-item-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <div class="sidebar-item-text">Mis Proyectos</div>
+                </div>
+                <div class="sidebar-item" onclick="openModal('aboutModal')">
+                    <div class="sidebar-item-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="sidebar-item-text">Sobre Mí</div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Seguridad & Privacidad</span>
+                </div>
+                <div class="sidebar-item" onclick="openModal('privacyModal')">
+                    <div class="sidebar-item-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="sidebar-item-text">Políticas de Privacidad</div>
+                </div>
+                <div class="sidebar-item" onclick="openModal('termsModal')">
+                    <div class="sidebar-item-icon">
+                        <i class="fas fa-file-contract"></i>
+                    </div>
+                    <div class="sidebar-item-text">Términos de Servicio</div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">
+                    <i class="fas fa-sliders-h"></i>
+                    <span>Ajustes</span>
+                </div>
+                <div class="sidebar-item" onclick="openModal('settingsModal')">
+                    <div class="sidebar-item-icon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <div class="sidebar-item-text">Configuración</div>
+                </div>
+                <div class="sidebar-item" onclick="openModal('helpModal')">
+                    <div class="sidebar-item-icon">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <div class="sidebar-item-text">Ayuda & Soporte</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Container -->
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="chat-title-container">
+                    <div class="chat-title">Asistente AI de DevHades02 <span class="online-badge"></span></div>
+                    <div class="chat-status">En línea • Con Llama 4</div>
+                </div>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message message-bot">
+                    <div class="message-sender">DevHades02 Assistant <i class="fas fa-check-circle verified-badge"></i></div>
+                    ¡Hola! Soy el asistente oficial de DevHades02. Puedo ayudarte con código, ideas creativas y más. ¿En qué puedo ayudarte hoy?
+                    <div class="message-time" id="currentTime"></div>
+                </div>
+            </div>
+            
+            <div class="ai-suggestions" id="aiSuggestions">
+                <div class="ai-suggestion" onclick="sendSuggestion('Crea un HTML para una página de login')">Crear HTML Login</div>
+                <div class="ai-suggestion" onclick="sendSuggestion('Muéstrame ejemplos de CSS con grid')">CSS Grid Examples</div>
+                <div class="ai-suggestion" onclick="sendSuggestion('¿Quién es DevHades02?')">¿Quién es DevHades02?</div>
+                <div class="ai-suggestion" onclick="sendSuggestion('Cómo contactar contigo')">Contacto</div>
+            </div>
+            
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" id="userInput" placeholder="Escribe tu mensaje..." autocomplete="off">
+                <button class="send-button" onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Buttons -->
+    <div class="floating-buttons">
+        <button class="floating-button" onclick="generateCodeSuggestion()">
+            <i class="fas fa-code"></i>
+        </button>
+        <button class="floating-button" onclick="askForHelp()">
+            <i class="fas fa-question"></i>
+        </button>
+        <button class="floating-button" onclick="showQuickActions()">
+            <i class="fas fa-bolt"></i>
+        </button>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Configuración</h2>
+                <div class="modal-close" onclick="closeModal('settingsModal')">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+            <div class="modal-body">
+                <h3>Configuración de la aplicación</h3>
+                <p>Aquí puedes personalizar tu experiencia con el asistente de DevHades02.</p>
+                <!-- Configuración adicional iría aquí -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Modal -->
+    <div class="modal-overlay" id="privacyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Políticas de Privacidad</h2>
+                <div class="modal-close" onclick="closeModal('privacyModal')">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+            <div class="modal-body">
+                <h3>Políticas de Privacidad de DevHades02 Chat</h3>
+                <p>Última actualización: 20 de noviembre de 2023</p>
+                
+                <h4>1. Recopilación de Información</h4>
+                <p>Recopilamos únicamente la información necesaria para el funcionamiento del chatbot, incluyendo mensajes y preferencias de usuario almacenadas localmente.</p>
+                
+                <h4>2. Uso de la Información</h4>
+                <p>Utilizamos tu información para proporcionar y mantener el servicio, personalizar tu experiencia y mejorar nuestro chatbot.</p>
+                
+                <h4>3. Almacenamiento de Datos</h4>
+                <p>Tus datos se almacenan localmente en tu dispositivo y no se envían a nuestros servidores a menos que sea necesario para el funcionamiento del servicio.</p>
+                
+                <h4>4. Seguridad</h4>
+                <p>Implementamos medidas de seguridad para proteger tu información, aunque ningún método de transmisión por Internet es 100% seguro.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div class="modal-overlay" id="aboutModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Sobre DevHades02</h2>
+                <div class="modal-close" onclick="closeModal('aboutModal')">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+            <div class="modal-body">
+                <h3>Desarrollador y Creador de Contenido</h3>
+                <p>DevHades02 es un desarrollador apasionado por la creación de aplicaciones innovadoras y contenido de calidad para la comunidad de desarrolladores.</p>
+                
+                <h4>Habilidades</h4>
+                <ul>
+                    <li>Desarrollo Web (HTML, CSS, JavaScript)</li>
+                    <li>Frameworks modernos (React, Vue, Angular)</li>
+                    <li>Desarrollo de APIs y Backend</li>
+                    <li>Inteligencia Artificial y Machine Learning</li>
+                </ul>
+                
+                <h4>Proyectos Destacados</h4>
+                <ul>
+                    <li>Sistemas de chatbots inteligentes</li>
+                    <li>Aplicaciones web progresivas</li>
+                    <li>Herramientas para desarrolladores</li>
+                    <li>Plataformas de aprendizaje</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Configuración inicial
+        const API_BASE = 'https://sadiya-tech-apis.vercel.app/ai/gemini';
+        const API_KEY  = 'sadiya';
+
+        const PROFILE = {
+            handle: 'devhades02',
+            name: 'DevHades02',
+            description: 'Desarrollador joven, apasionado por la programación y la IA.',
+            links: {
+                github: 'https://github.com/devhades02',
+                instagram: 'https://instagram.com/devhades02',
+                whatsapp: 'https://wa.me/tu_numero_aqui',
+                email: 'mailto:dev@hady.xyz'
+            }
+        };
+
+        // Elementos DOM
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        const aiSuggestions = document.getElementById('aiSuggestions');
+        const currentTime = document.getElementById('currentTime');
+        const sidebar = document.getElementById('sidebar');
+
+        // Variables de estado
+        let currentChatMode = 'ai';
+        let isVIPMode = false;
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCurrentTime();
+            loadSettings();
+            loadChatHistory();
+            
+            // Mostrar hora actual cada minuto
+            setInterval(updateCurrentTime, 60000);
+            
+            // Enfocar el input al cargar
+            userInput.focus();
+
+            // Mostrar mensaje de bienvenida VIP después de un tiempo
+            setTimeout(showVIPWelcome, 2000);
+        });
+
+        function updateCurrentTime() {
+            const now = new Date();
+            currentTime.textContent = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+
+        function escapeHtml(s) { 
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); 
+        }
+
+        function appendMessage(text, isUser = false, isVIP = false, sender = null, buttons = [], isCode = false, codeLanguage = 'html') {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'message-user' : isVIP ? 'message-vip' : 'message-bot'}`;
+            
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            let messageHTML = '';
+            
+            if (sender) {
+                messageHTML += `<div class="message-sender">${sender} ${isVIP ? '<span class="vip-badge">VIP</span>' : '<i class="fas fa-check-circle verified-badge"></i>'}</div>`;
+            }
+            
+            if (isCode) {
+                // Formatear el código con botón de copiar
+                messageHTML += `<div>${escapeHtml(text.replace(/```[\s\S]*?```/g, ''))}</div>`;
+                
+                // Extraer el código entre ```
+                const codeMatch = text.match(/```[\s\S]*?```/g);
+                if (codeMatch) {
+                    codeMatch.forEach(codeBlock => {
+                        const codeContent = codeBlock.replace(/```(\w+)?\n?/, '').replace(/```$/, '');
+                        messageHTML += `<div class="code-container">`;
+                        messageHTML += `<div class="code-header">`;
+                        messageHTML += `<span>${codeLanguage.toUpperCase()}</span>`;
+                        messageHTML += `<button class="copy-button" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>`;
+                        messageHTML += `</div>`;
+                        messageHTML += `<div class="code-block"><code>${escapeHtml(codeContent)}</code></div>`;
+                        messageHTML += `</div>`;
+                    });
+                } else {
+                    messageHTML += `<div class="code-container">`;
+                    messageHTML += `<div class="code-header">`;
+                    messageHTML += `<span>${codeLanguage.toUpperCase()}</span>`;
+                    messageHTML += `<button class="copy-button" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>`;
+                    messageHTML += `</div>`;
+                    messageHTML += `<div class="code-block"><code>${escapeHtml(text)}</code></div>`;
+                    messageHTML += `</div>`;
+                }
+            } else {
+                messageHTML += `<div>${escapeHtml(text)}</div>`;
+            }
+            
+            messageHTML += `<div class="message-time">${timeString}</div>`;
+            
+            messageDiv.innerHTML = messageHTML;
+            chatMessages.appendChild(messageDiv);
+            
+            // Añadir botones de acción fuera del mensaje si existen
+            if (buttons.length > 0) {
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'message-actions';
+                
+                buttons.forEach(button => {
+                    const buttonEl = document.createElement('button');
+                    buttonEl.className = 'message-action-button';
+                    buttonEl.innerHTML = button.text;
+                    buttonEl.onclick = new Function(button.action);
+                    actionsDiv.appendChild(buttonEl);
+                });
+                
+                chatMessages.appendChild(actionsDiv);
+            }
+            
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Guardar en historial si está activado
+            if (localStorage.getItem('saveHistory') !== 'false') {
+                saveToHistory(text, isUser, timeString, isVIP, sender, buttons, isCode, codeLanguage);
+            }
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-container').querySelector('.code-block');
+            const code = codeBlock.querySelector('code').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check"></i> Copiado';
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                }, 2000);
+            });
+        }
+
+        function isCodeRequest(q) {
+            if (!q) return false;
+            const t = q.toLowerCase();
+            const codeTriggers = [
+                'html', 'css', 'javascript', 'js', 'python', 'php', 'code', 'codigo',
+                'programa', 'function', 'función', 'crea un', 'haz un', 'make a', 'create a',
+                'ejemplo', 'example', 'implementa', 'implement', 'script', 'java', 'c++', 'c#',
+                'ruby', 'go', 'rust', 'sql', 'mysql', 'postgresql', 'mongodb', '```'
+            ];
+            return codeTriggers.some(tr => t.includes(tr));
+        }
+
+        function isVIPRequest(q) {
+            if (!q) return false;
+            const t = q.toLowerCase();
+            const vipTriggers = [
+                'devhades02', 'hady', 'creador', 'author', 'dueño', 'owner',
+                'vip', 'premium', 'exclusivo', 'privilegio', 'special'
+            ];
+            return vipTriggers.some(tr => t.includes(tr));
+        }
+
+        function detectCodeLanguage(text) {
+            if (text.includes('```html') || text.toLowerCase().includes('html')) return 'html';
+            if (text.includes('```css') || text.toLowerCase().includes('css')) return 'css';
+            if (text.includes('```js') || text.includes('```javascript') || text.toLowerCase().includes('javascript') || text.toLowerCase().includes('js')) return 'javascript';
+            if (text.includes('```python') || text.toLowerCase().includes('python')) return 'python';
+            if (text.includes('```php') || text.toLowerCase().includes('php')) return 'php';
+            if (text.includes('```java') || text.toLowerCase().includes('java')) return 'java';
+            return 'code';
+        }
+
+        function detectCodeInResponse(text) {
+            return text.includes('```');
+        }
+
+        async function askRemoteAI(userMessage) {
+            const systemPrompt = `Eres un chatbot creado por ${PROFILE.name}. Responde de forma amigable y profesional. ` +
+                `Si te piden el contacto, indica que tu creador está en todas las plataformas como @${PROFILE.handle}. ` +
+                `No inventes datos personales sensibles. Responde solo al contenido del usuario. ` +
+                `Si el usuario pide código, responde con el código formateado entre \`\`\` para que se pueda copiar fácilmente.`;
+
+            const finalQuery = `${systemPrompt}\n\nUsuario: ${userMessage}`;
+            const url = `${API_BASE}?q=${encodeURIComponent(finalQuery)}&apikey=${encodeURIComponent(API_KEY)}`;
+
+            try {
+                const resp = await fetch(url, { method: 'GET' });
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                
+                const json = await resp.json();
+                const text = json.result ?? json.response ?? json.data ?? json.message ?? JSON.stringify(json);
+                return (typeof text === 'string') ? text : JSON.stringify(text);
+            } catch (error) {
+                console.error('Error:', error);
+                return 'Lo siento, ha ocurrido un error al procesar tu solicitud. Por favor, intenta nuevamente.';
+            }
+        }
+        function showVIPWelcome() {
+            appendMessage(
+                `¡Bienvenido al chat VIP de DevHades02! Como usuario especial, tienes acceso a funciones exclusivas. ¿En qué puedo ayudarte hoy?`,
+                false,
+                true,
+                "DevHades02 VIP"
+            );
+            
+            // Añadir botones de acción fuera del mensaje
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'message-actions';
+            actionsDiv.innerHTML = `
+                <button class="message-action-button" onclick="showVIPProjects()">Ver Proyectos</button>
+                <button class="message-action-button" onclick="showVIPSupport()">Soporte VIP</button>
+                <button class="message-action-button" onclick="showVIPBenefits()">Beneficios</button>
+            `;
+            chatMessages.appendChild(actionsDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showVIPProjects() {
+            appendMessage(
+                `Proyectos VIP actuales:\n\n` +
+                `• Sistema de bots avanzados con IA\n` +
+                `• Aplicaciones móviles premium\n` +
+                `• Plataforma de automatización\n` +
+                `• Herramientas de desarrollo exclusivas\n\n` +
+                `¿Te interesa alguno en particular?`,
+                false,
+                true,
+                "DevHades02 VIP"
+            );
+            
+            // Añadir botones de acción fuera del mensaje
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'message-actions';
+            actionsDiv.innerHTML = `
+                <button class="message-action-button" onclick="contactEmail()">Contactar por Email</button>
+                <button class="message-action-button" onclick="contactWhatsApp()">Contactar por WhatsApp</button>
+            `;
+            chatMessages.appendChild(actionsDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showVIPSupport() {
+            appendMessage(
+                `Soporte VIP prioritario:\n\n` +
+                `Puedes contactarnos directamente para:\n` +
+                `• Asistencia técnica inmediata\n` +
+                `• Solicitudes de funciones personalizadas\n` +
+                `• Consultas sobre desarrollo\n\n` +
+                `Email: dev@hady.xyz\nWhatsApp: +1234567890`,
+                false,
+                true,
+                "DevHades02 VIP"
+            );
+            
+            // Añadir botones de acción fuera del mensaje
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'message-actions';
+            actionsDiv.innerHTML = `
+                <button class="message-action-button" onclick="contactEmail()">Contactar por Email</button>
+                <button class="message-action-button" onclick="contactWhatsApp()">Contactar por WhatsApp</button>
+            `;
+            chatMessages.appendChild(actionsDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showVIPBenefits() {
+            appendMessage(
+                `Tus beneficios VIP incluyen:\n\n` +
+                `✅ Respuestas prioritarias 24/7\n` +
+                `✅ Acceso a funciones beta\n` +
+                `✅ Soporte técnico personalizado\n` +
+                `✅ Descuentos en servicios premium\n` +
+                `✅ Contenido exclusivo regularmente\n\n` +
+                `¿Necesitas ayuda con algo específico?`,
+                false,
+                true,
+                "DevHades02 VIP"
+            );
+        }
+
+        function contactEmail() {
+            window.open(PROFILE.links.email, '_blank');
+        }
+
+        function contactWhatsApp() {
+            window.open(PROFILE.links.whatsapp, '_blank');
+        }
+
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text) return;
+            
+            appendMessage(text, true);
+            userInput.value = '';
+            
+            // Mostrar mensaje de "escribiendo..."
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'message message-bot';
+            typingIndicator.id = 'typingIndicator';
+            typingIndicator.innerHTML = `
+                <div><i class="fas fa-ellipsis-h"></i> Escribiendo...</div>
+            `;
+            chatMessages.appendChild(typingIndicator);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            try {
+                let reply = await askRemoteAI(text);
+                let isVIP = isVIPRequest(text);
+                let sender = "DevHades02 Assistant";
+                let buttons = [];
+                let isCode = detectCodeInResponse(reply);
+                let codeLanguage = isCode ? detectCodeLanguage(reply) : 'html';
+                
+                // Detectar si es una solicitud VIP
+                if (isVIP) {
+                    sender = "DevHades02 VIP";
+                    
+                    if (text.toLowerCase().includes('proyecto')) {
+                        buttons = [
+                            { text: "Ver Detalles", action: "showVIPProjects()" },
+                            { text: "Contactar", action: "showVIPSupport()" }
+                        ];
+                    } else if (text.toLowerCase().includes('contacto')) {
+                        buttons = [
+                            { text: "Email", action: "contactEmail()" },
+                            { text: "WhatsApp", action: "contactWhatsApp()" }
+                        ];
+                    } else {
+                        buttons = [
+                            { text: "Más Info VIP", action: "showVIPBenefits()" },
+                            { text: "Contactar", action: "showVIPSupport()" }
+                        ];
+                    }
+                }
+                
+                // Eliminar indicador de escribiendo
+                const indicator = document.getElementById('typingIndicator');
+                if (indicator) indicator.remove();
+                
+                appendMessage(reply, false, isVIP, sender, buttons, isCode, codeLanguage);
+            } catch (error) {
+                // Eliminar indicador de escribiendo
+                const indicator = document.getElementById('typingIndicator');
+                if (indicator) indicator.remove();
+                
+                appendMessage('Error: ' + error.message, false);
+                console.error('Error detalle:', error);
+            }
+        }
+
+        function sendSuggestion(text) {
+            userInput.value = text;
+            sendMessage();
+        }
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkTheme', isDark);
+            
+            // Cambiar icono
+            const themeIcon = document.querySelector('.header-right .header-icon:nth-child(2) i');
+            themeIcon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+        }
+
+        function changeChatMode(mode) {
+            currentChatMode = mode;
+            
+            // Actualizar UI según el modo
+            const items = document.querySelectorAll('.sidebar-item');
+            items.forEach(item => item.classList.remove('active'));
+            
+            event.currentTarget.classList.add('active');
+            
+            // Cambiar sugerencias según el modo
+            updateAISuggestions();
+        }
+
+        function updateAISuggestions() {
+            if (currentChatMode === 'code') {
+                aiSuggestions.innerHTML = `
+                    <div class="ai-suggestion" onclick="sendSuggestion('Crea un HTML para una página de login')">Crear HTML Login</div>
+                    <div class="ai-suggestion" onclick="sendSuggestion('Muéstrame ejemplos de CSS con grid')">CSS Grid Examples</div>
+                    <div class="ai-suggestion" onclick="sendSuggestion('Cómo centrar un div con CSS')">Centrar un DIV</div>
+                    <div class="ai-suggestion" onclick="sendSuggestion('Función JavaScript para validar email')">Validar Email JS</div>
+                `;
+            } else if (currentChatMode === 'creative') {
+                aiSuggestions.innerHTML = `
+                    <div class="ai-suggestion" onclick="sendSuggestion('Ideas para una aplicación innovadora')">Ideas de Apps</div>
+                    <div class="ai-suggestion" onclick="sendSuggestion('Nombres creativos para un proyecto de código')">Nombres Creativos</div>
+                    <div class="ai-suggestion" onclick="sendSuggestion('Diseños modernos para landing pages')">Diseños Modernos</div>
+                    <div class="ai-suggestion" onclick="sendSuggestion('Cómo mejorar la experiencia de usuario')">Mejorar UX</div>
+                `;
+            } else {
+                aiSuggestions.innerHTML = `
+                    <div class="ai-suggestion" onclick="sendSuggestion('Crea un HTML para una página de login')">Crear HTML Login</div>
+                    <div class="ai-suggestion" onclick="sendSuggestion('Muéstrame ejemplos de CSS con grid')">CSS Grid Examples</div>
+                    <div class="ai-suggestion" onclick="sendSuggestion('¿Quién es DevHades02?')">¿Quién es DevHades02?</div>
+                    <div class="ai-suggestion" onclick="sendSuggestion('Cómo contactar contigo')">Contacto</div>
+                `;
+            }
+        }
+        function generateCodeSuggestion() {
+            const codeRequests = [
+                'Crea un HTML para una página de login',
+                'Muéstrame ejemplos de CSS con grid',
+                'Cómo crear una función JavaScript para validar email',
+                'Ejemplo de una API REST con Node.js',
+                'Cómo hacer un efecto de glassmorphism con CSS'
+            ];
+            
+            const randomRequest = codeRequests[Math.floor(Math.random() * codeRequests.length)];
+            sendSuggestion(randomRequest);
+        }
+
+        function askForHelp() {
+            sendSuggestion('Necesito ayuda con un problema de código');
+        }
+
+        function showQuickActions() {
+            appendMessage(
+                `Acciones rápidas disponibles:\n\n` +
+                `• Generar código de ejemplo\n` +
+                `• Obtener ayuda técnica\n` +
+                `• Ver proyectos de DevHades02\n` +
+                `• Contactar soporte VIP\n\n` +
+                `Selecciona una opción o escribe tu solicitud.`,
+                false,
+                false,
+                "DevHades02 Assistant"
+            );
+            
+            // Añadir botones de acción fuera del mensaje
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'message-actions';
+            actionsDiv.innerHTML = `
+                <button class="message-action-button" onclick="generateCodeSuggestion()">Generar Código</button>
+                <button class="message-action-button" onclick="askForHelp()">Soporte Técnico</button>
+                <button class="message-action-button" onclick="showVIPProjects()">Ver Proyectos</button>
+            `;
+            chatMessages.appendChild(actionsDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showVIPContent() {
+            appendMessage(
+                `Contenido exclusivo VIP de DevHades02:\n\n` +
+                `🔒 Acceso a repositorios privados\n` +
+                `🎥 Tutoriales y cursos premium\n` +
+                `🛠️ Herramientas exclusivas para desarrolladores\n` +
+                `📚 Documentación avanzada\n\n` +
+                `Contacta a @devhades02 para obtener acceso.`,
+                false,
+                true,
+                "DevHades02 VIP"
+            );
+            
+            // Añadir botones de acción fuera del mensaje
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'message-actions';
+            actionsDiv.innerHTML = `
+                <button class="message-action-button" onclick="showVIPSupport()">Solicitar Acceso</button>
+                <button class="message-action-button" onclick="showVIPBenefits()">Ver Beneficios</button>
+            `;
+            chatMessages.appendChild(actionsDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showProjects() {
+            appendMessage(
+                `Proyectos destacados de DevHades02:\n\n` +
+                `• 🤖 Sistema de chatbots inteligentes\n` +
+                `• 🌐 Plataforma de aprendizaje para devs\n` +
+                `• 🛠️ Suite de herramientas para desarrollo\n` +
+                `• 📱 Aplicaciones móviles innovadoras\n\n` +
+                `¿Te interesa conocer más sobre algún proyecto en particular?`,
+                false,
+                true,
+                "DevHades02 VIP"
+            );
+            
+            // Añadir botones de acción fuera del mensaje
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'message-actions';
+            actionsDiv.innerHTML = `
+                <button class="message-action-button" onclick="showVIPProjects()">Detalles de Proyectos</button>
+                <button class="message-action-button" onclick="showVIPSupport()">Colaborar</button>
+            `;
+            chatMessages.appendChild(actionsDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function loadSettings() {
+            // Tema oscuro
+            if (localStorage.getItem('darkTheme') === 'true') {
+                document.body.classList.add('dark-mode');
+                
+                const themeIcon = document.querySelector('.header-right .header-icon:nth-child(2) i');
+                themeIcon.className = 'fas fa-sun';
+            }
+        }
+
+        function saveToHistory(text, isUser, timeString, isVIP = false, sender = null, buttons = [], isCode = false, codeLanguage = 'html') {
+            let history = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+            history.push({ text, isUser, time: timeString, isVIP, sender, buttons, isCode, codeLanguage });
+            localStorage.setItem('chatHistory', JSON.stringify(history));
+        }
+
+        function loadChatHistory() {
+            if (localStorage.getItem('saveHistory') === 'false') return;
+            
+            const history = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+            history.forEach(msg => {
+                appendMessage(msg.text, msg.isUser, msg.isVIP, msg.sender, msg.buttons, msg.isCode, msg.codeLanguage);
+            });
+            
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Permitir enviar con Enter
+        userInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Cerrar modal al hacer clic fuera
+        window.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                document.querySelectorAll('.modal-overlay').forEach(modal => {
+                    modal.classList.remove('active');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
