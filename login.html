@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevHades02 Chat - Iniciar Sesión</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8a2be2;
+            --primary-light: #9d4edd;
+            --primary-dark: #7b2cbf;
+            --bg-color: #f5f5f7;
+            --card-bg: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --text-tertiary: #888888;
+            --border-color: #e0e0e0;
+            --success: #34c759;
+            --warning: #ff9500;
+            --error: #ff3b30;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        /* Animación de carga inicial */
+        .loader-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .loader-logo {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            animation: pulse 1.5s infinite;
+        }
+
+        .loader-logo i {
+            font-size: 2.5rem;
+            color: var(--primary);
+        }
+
+        .loader-text {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 30px;
+        }
+
+        .loader-progress {
+            width: 200px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .loader-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: white;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Contenedor principal de login */
+        .login-container {
+            width: 100%;
+            max-width: 440px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .login-container.loaded {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .login-form-container {
+            width: 100%;
+            background-color: var(--card-bg);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .login-header {
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .login-logo {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .login-logo i {
+            font-size: 2rem;
+            color: white;
+        }
+
+        .login-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .login-header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Formularios */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.1);
+        }
+
+        .form-check {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .form-check-input {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+        }
+
+        .form-check-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .form-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .form-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Botones */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(138, 43, 226, 0.3);
+        }
+
+        /* Footer del login */
+        .login-footer {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--text-tertiary);
+            font-size: 0.9rem;
+        }
+
+        .login-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Modal de verificación */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--success), #2ecc71);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            animation: pulse 1.5s infinite;
+        }
+
+        .modal-icon i {
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .modal-text {
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        /* Formularios alternativos */
+        .alternative-form {
+            display: none;
+        }
+
+        /* Mensajes de error */
+        .error-message {
+            color: var(--error);
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .form-control.error {
+            border-color: var(--error);
+        }
+
+        /* Tema selector */
+        .theme-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .login-form-container {
+                padding: 30px 20px;
+            }
+            
+            .login-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .btn {
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+  <!-- Animación de carga inicial -->
+    <div class="loader-container" id="loader">
+        <div class="loader-logo">
+            <i class="fas fa-comment-dots"></i>
+        </div>
+        <div class="loader-text">Cargando DevHades02 Chat</div>
+        <div class="loader-progress">
+            <div class="loader-progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+
+    <!-- Contenedor principal de login -->
+    <div class="login-container" id="loginContainer">
+        <div class="theme-selector">
+            <div class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </div>
+        </div>
+        
+        <div class="login-form-container">
+            <!-- Formulario de inicio de sesión (por defecto) -->
+            <div id="loginFormContainer">
+                <div class="login-header">
+                    <div class="login-logo">
+                        <i class="fas fa-comment-dots"></i>
+                    </div>
+                    <h1>Bienvenido</h1>
+                    <p>Inicia sesión en tu cuenta</p>
+                </div>
+
+                <div class="form-container">
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="email">Correo electrónico</label>
+                            <input type="email" class="form-control" id="email" placeholder="tu@email.com" required>
+                            <div class="error-message" id="emailError">Por favor ingresa un correo electrónico válido</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Contraseña</label>
+                            <input type="password" class="form-control" id="password" placeholder="••••••••" required>
+                            <div class="error-message" id="passwordError">La contraseña debe tener al menos 6 caracteres</div>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="remember">
+                            <label class="form-check-label" for="remember">Recordar sesión</label>
+                            <a href="#" class="form-link" id="showForgotPassword">¿Olvidaste tu contraseña?</a>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Iniciar sesión</button>
+                    </form>
+                </div>
+
+                <div class="login-footer">
+                    ¿No tienes una cuenta? <a href="#" id="showRegister">Regístrate</a>
+                </div>
+            </div>
+
+            <!-- Formulario de registro -->
+            <div id="registerFormContainer" class="alternative-form">
+                <div class="login-header">
+                    <div class="login-logo">
+                        <i class="fas fa-comment-dots"></i>
+                    </div>
+                    <h1>Crear cuenta</h1>
+                    <p>Completa tus datos para registrarte</p>
+                </div>
+
+                <div class="form-container">
+                    <form id="registerForm">
+                        <div class="form-group">
+                            <label for="registerName">Nombre completo</label>
+                            <input type="text" class="form-control" id="registerName" placeholder="Tu nombre completo" required>
+                            <div class="error-message" id="nameError">Por favor ingresa tu nombre</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerEmail">Correo electrónico</label>
+                            <input type="email" class="form-control" id="registerEmail" placeholder="tu@email.com" required>
+                            <div class="error-message" id="registerEmailError">Por favor ingresa un correo electrónico válido</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerPassword">Contraseña</label>
+                            <input type="password" class="form-control" id="registerPassword" placeholder="••••••••" required>
+                            <div class="error-message" id="registerPasswordError">La contraseña debe tener al menos 6 caracteres</div>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirmar contraseña</label>
+                            <input type="password" class="form-control" id="confirmPassword" placeholder="••••••••" required>
+                            <div class="error-message" id="confirmPasswordError">Las contraseñas no coinciden</div>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="terms" required>
+                            <label class="form-check-label" for="terms">Acepto los <a href="#" class="form-link">términos y condiciones</a></label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Crear cuenta</button>
+                    </form>
+                </div>
+
+                <div class="login-footer">
+                    ¿Ya tienes una cuenta? <a href="#" id="showLogin">Inicia sesión</a>
+                </div>
+            </div>
+
+            <!-- Formulario de recuperación de contraseña -->
+            <div id="forgotPasswordContainer" class="alternative-form">
+                <div class="login-header">
+                    <div class="login-logo">
+                        <i class="fas fa-comment-dots"></i>
+                    </div>
+                    <h1>Recuperar contraseña</h1>
+                    <p>Ingresa tu email para restablecer tu contraseña</p>
+                </div>
+
+                <div class="form-container">
+                    <form id="forgotPasswordForm">
+                        <div class="form-group">
+                            <label for="recoveryEmail">Correo electrónico</label>
+                            <input type="email" class="form-control" id="recoveryEmail" placeholder="tu@email.com" required>
+                            <div class="error-message" id="recoveryEmailError">Por favor ingresa un correo electrónico válido</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Enviar enlace de recuperación</button>
+                    </form>
+                </div>
+
+                <div class="login-footer">
+                    <a href="#" id="backToLogin">Volver al inicio de sesión</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de verificación -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h2 class="modal-title" id="modalTitle">¡Inicio de sesión exitoso!</h2>
+                <p class="modal-text" id="modalText">Has iniciado sesión correctamente. Redirigiendo a DevHades02 Chat...</p>
+                <button class="btn btn-primary" onclick="redirectToChat()">Continuar</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Simular progreso de carga
+        document.addEventListener('DOMContentLoaded', function() {
+            const progressBar = document.getElementById('progressBar');
+            const loader = document.getElementById('loader');
+            const loginContainer = document.getElementById('loginContainer');
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                progressBar.style.width = `${progress}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        loader.style.opacity = '0';
+                        setTimeout(() => {
+                            loader.style.display = 'none';
+                            loginContainer.classList.add('loaded');
+                        }, 500);
+                    }, 300);
+                }
+            }, 200);
+            
+            // Inicializar tema
+            initTheme();
+        });
+
+        // Elementos del DOM
+        const loginFormContainer = document.getElementById('loginFormContainer');
+        const registerFormContainer = document.getElementById('registerFormContainer');
+        const forgotPasswordContainer = document.getElementById('forgotPasswordContainer');
+        
+        const showRegisterLink = document.getElementById('showRegister');
+        const showLoginLink = document.getElementById('showLogin');
+        const showForgotPasswordLink = document.getElementById('showForgotPassword');
+        const backToLoginLink = document.getElementById('backToLogin');
+        
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+        
+        const successModal = document.getElementById('successModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalText = document.getElementById('modalText');
+        
+        const themeToggle = document.getElementById('themeToggle');
+
+        // Cambiar entre formularios
+        showRegisterLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            loginFormContainer.style.display = 'none';
+            registerFormContainer.style.display = 'block';
+            forgotPasswordContainer.style.display = 'none';
+        });
+
+        showLoginLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            loginFormContainer.style.display = 'block';
+            registerFormContainer.style.display = 'none';
+            forgotPasswordContainer.style.display = 'none';
+        });
+
+        showForgotPasswordLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            loginFormContainer.style.display = 'none';
+            registerFormContainer.style.display = 'none';
+            forgotPasswordContainer.style.display = 'block';
+        });
+
+        backToLoginLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            loginFormContainer.style.display = 'block';
+            registerFormContainer.style.display = 'none';
+            forgotPasswordContainer.style.display = 'none';
+        });
+
+        // Validación de formularios
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function validatePassword(password) {
+            return password.length >= 6;
+        }
+
+        // Manejar el formulario de login
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+            
+            // Validación
+            let isValid = true;
+            
+            if (!validateEmail(email)) {
+                document.getElementById('emailError').style.display = 'block';
+                document.getElementById('email').classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('emailError').style.display = 'none';
+                document.getElementById('email').classList.remove('error');
+            }
+            
+            if (!validatePassword(password)) {
+                document.getElementById('passwordError').style.display = 'block';
+                document.getElementById('password').classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('passwordError').style.display = 'none';
+                document.getElementById('password').classList.remove('error');
+            }
+            
+            if (isValid) {
+                // Simular verificación de credenciales
+                simulateLogin({ email, password, remember });
+            }
+        });
+
+        // Manejar el formulario de registro
+        registerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Validación
+            let isValid = true;
+            
+            if (!name) {
+                document.getElementById('nameError').style.display = 'block';
+                document.getElementById('registerName').classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('nameError').style.display = 'none';
+                document.getElementById('registerName').classList.remove('error');
+            }
+            
+            if (!validateEmail(email)) {
+                document.getElementById('registerEmailError').style.display = 'block';
+                document.getElementById('registerEmail').classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('registerEmailError').style.display = 'none';
+                document.getElementById('registerEmail').classList.remove('error');
+            }
+            
+            if (!validatePassword(password)) {
+                document.getElementById('registerPasswordError').style.display = 'block';
+                document.getElementById('registerPassword').classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('registerPasswordError').style.display = 'none';
+                document.getElementById('registerPassword').classList.remove('error');
+            }
+            
+            if (password !== confirmPassword) {
+                document.getElementById('confirmPasswordError').style.display = 'block';
+                document.getElementById('confirmPassword').classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('confirmPasswordError').style.display = 'none';
+                document.getElementById('confirmPassword').classList.remove('error');
+            }
+               if (isValid) {
+                // Simular registro exitoso
+                modalTitle.textContent = '¡Registro exitoso!';
+                modalText.textContent = 'Tu cuenta ha sido creada correctamente. Redirigiendo a DevHades02 Chat...';
+                successModal.classList.add('active');
+                
+                // Guardar datos de usuario (simulado)
+                localStorage.setItem('user', JSON.stringify({
+                    name,
+                    email,
+                    password
+                }));
+            }
+        });
+
+        // Manejar el formulario de recuperación de contraseña
+        forgotPasswordForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('recoveryEmail').value;
+            
+            // Validación
+            if (!validateEmail(email)) {
+                document.getElementById('recoveryEmailError').style.display = 'block';
+                document.getElementById('recoveryEmail').classList.add('error');
+            } else {
+                document.getElementById('recoveryEmailError').style.display = 'none';
+                document.getElementById('recoveryEmail').classList.remove('error');
+                
+                // Simular envío de correo
+                modalTitle.textContent = '¡Correo enviado!';
+                modalText.textContent = 'Hemos enviado un enlace de recuperación a tu dirección de correo electrónico.';
+                successModal.classList.add('active');
+            }
+        });
+
+        // Simular inicio de sesión
+        function simulateLogin(credentials) {
+            // Mostrar carga (simulada)
+            const loginBtn = loginForm.querySelector('button[type="submit"]');
+            const originalText = loginBtn.textContent;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Iniciando sesión...';
+            loginBtn.disabled = true;
+            
+            // Simular retraso de red
+            setTimeout(() => {
+                // Verificar si existe usuario registrado
+                const storedUser = localStorage.getItem('user');
+                
+                if (storedUser) {
+                    const user = JSON.parse(storedUser);
+                    
+                    if (user.email === credentials.email && user.password === credentials.password) {
+                        // Login exitoso
+                        successModal.classList.add('active');
+                        
+                        // Guardar sesión si se seleccionó "Recordar"
+                        if (credentials.remember) {
+                            localStorage.setItem('currentUser', JSON.stringify(user));
+                        } else {
+                            sessionStorage.setItem('currentUser', JSON.stringify(user));
+                        }
+                    } else {
+                        // Credenciales incorrectas
+                        alert('Error: Correo electrónico o contraseña incorrectos');
+                    }
+                } else {
+                    // Usuario no registrado, simular login con datos cualquiera
+                    successModal.classList.add('active');
+                    
+                    // Guardar usuario de prueba
+                    const demoUser = {
+                        name: 'Usuario Demo',
+                        email: credentials.email,
+                        password: credentials.password
+                    };
+                    
+                    if (credentials.remember) {
+                        localStorage.setItem('currentUser', JSON.stringify(demoUser));
+                    } else {
+                        sessionStorage.setItem('currentUser', JSON.stringify(demoUser));
+                    }
+                }
+                
+                // Restaurar botón
+                loginBtn.textContent = originalText;
+                loginBtn.disabled = false;
+            }, 1500);
+        }
+
+        // Mostrar estado de carga
+        function showLoading(message) {
+            const loader = document.getElementById('loader');
+            const loaderText = document.querySelector('.loader-text');
+            
+            loaderText.textContent = message;
+            loader.style.display = 'flex';
+            loader.style.opacity = '1';
+        }
+
+        // Redirigir al chat
+        function redirectToChat() {
+            showLoading('Redirigiendo a DevHades02 Chat...');
+            
+            // Redirigir a chatbot5.html después de un breve retraso
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1500);
+        }
+
+        // Generar ID aleatorio
+        function generateId() {
+            return Math.floor(Math.random() * 1000000).toString();
+        }
+        
+        // Sistema de temas
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            setTheme(savedTheme);
+            
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                setTheme(newTheme);
+                localStorage.setItem('theme', newTheme);
+            });
+        }
+        
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.body.classList.add('dark-theme');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                
+                // Ajustar colores para modo oscuro
+                document.documentElement.style.setProperty('--bg-color', '#121212');
+                document.documentElement.style.setProperty('--card-bg', '#1e1e1e');
+                document.documentElement.style.setProperty('--text-primary', '#ffffff');
+                document.documentElement.style.setProperty('--text-secondary', '#cccccc');
+                document.documentElement.style.setProperty('--border-color', '#333333');
+            } else {
+                document.body.classList.remove('dark-theme');
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                
+                // Restaurar colores originales
+                document.documentElement.style.setProperty('--bg-color', '#f5f5f7');
+                document.documentElement.style.setProperty('--card-bg', '#ffffff');
+                document.documentElement.style.setProperty('--text-primary', '#333333');
+                document.documentElement.style.setProperty('--text-secondary', '#666666');
+                document.documentElement.style.setProperty('--border-color', '#e0e0e0');
+            }
+        }
+    </script>
+</body>
+</html>
